@@ -30,6 +30,15 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background: #fff;
+  width: 1280px;
+  height: 800px;
+  overflow: hidden;
+}
+
+#root {
+  width: 1280px;
+  height: 800px;
+  overflow: hidden;
 }
 
 h1 {
