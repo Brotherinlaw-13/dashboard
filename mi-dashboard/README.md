@@ -1,12 +1,41 @@
-# React + Vite
+# Raspberry Pi Google Calendar Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This dashboard displays upcoming events from multiple public Google Calendars using their iCal URLs. Each calendar is color-coded for clarity.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. **Configure Calendars**
+   - Edit `src/calendarConfig.js` to add your public Google Calendar iCal URLs and assign a color to each.
+   - Example:
+     ```js
+     export default [
+       {
+         name: "Family",
+         url: "https://calendar.google.com/calendar/ical/your-family-calendar-url.ics",
+         color: "#FF5733"
+       },
+       // Add more calendars as needed
+     ];
+     ```
 
-## Expanding the ESLint configuration
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+3. **Run the dashboard**
+   ```bash
+   npm run dev
+   ```
+   - Open the provided local URL in your browser (e.g., on your Raspberry Pi display).
+
+## Features
+- Fetches and displays up to 20 upcoming events from all configured calendars
+- Color-codes events by calendar
+- Ongoing events are labeled "Now" and pinned to the top
+- Updates every 10 minutes
+- Shows a placeholder if there are no upcoming events
+
+## Notes
+- Only public Google Calendar iCal URLs are supported (no authentication required)
+- For best results, use on a Raspberry Pi with a browser in kiosk mode
