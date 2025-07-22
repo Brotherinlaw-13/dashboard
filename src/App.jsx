@@ -259,7 +259,7 @@ function App() {
 
   useEffect(() => {
     loadEvents();
-    const interval = setInterval(loadEvents, 10 * 60 * 1000); // every 10 min
+    const interval = setInterval(loadEvents, 5 * 60 * 1000); // every 5 min
     return () => clearInterval(interval);
   }, []);
 
@@ -273,9 +273,13 @@ function App() {
           <div className="placeholder">No hay eventos próximos</div>
         ) : (
           <div className="event-list">
-            {events.map((event, i) => (
-              <EventItem event={event} key={i} />
-            ))}
+            {events
+              .filter(event => !isToday(event.start))
+              .filter(event => !event.title.toLowerCase().includes('basura'))
+              .slice(0, 11)
+              .map((event, i) => (
+                <EventItem event={event} key={i} />
+              ))}
           </div>
         )}
       </div>

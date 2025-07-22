@@ -69,7 +69,7 @@ export async function fetchAllEvents() {
     const future = upcoming.filter(e => !(e.start <= now && (e.end ? e.end >= now : false)));
     future.sort((a, b) => a.start - b.start);
     // Pin ongoing events to top and limit to 11
-    const sorted = [...ongoing, ...future].slice(0, 11);
+    const sorted = [...ongoing, ...future];
     return sorted.map(e => ({
       ...e,
       isOngoing: e.start <= now && (e.end ? e.end >= now : false),
