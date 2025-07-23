@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  const BOT_TOKEN = process.env.VITE_TELEGRAM_BOT_TOKEN;
+  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
   
   console.log('[Webhook] Request recibido:', req.method, req.url);
   console.log('[Webhook] Token disponible:', !!BOT_TOKEN);

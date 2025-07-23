@@ -11,7 +11,7 @@ export default async function handler(req, res) {
       : 'https://dashboard-sigma-three-72.vercel.app';
 
     const webhookUrl = `${baseUrl}/api/webhook`;
-    const botToken = process.env.VITE_TELEGRAM_BOT_TOKEN;
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
     
     console.log('[Setup] Configurando webhook en:', webhookUrl);
     console.log('[Setup] Bot token disponible:', !!botToken);
