@@ -26,12 +26,17 @@ export function getDailyMessages() {
 
 // Función para procesar mensaje entrante
 export async function processIncomingMessage(message) {
+  console.log('[TelegramBot] Procesando mensaje:', message);
+  
   const today = getCurrentDate();
   const userId = message.from.id;
   const userName = message.from.first_name || message.from.username || 'Usuario';
   const text = message.text;
 
-  if (!text) return;
+  if (!text) {
+    console.log('[TelegramBot] No hay texto en el mensaje');
+    return;
+  }
 
   resetDailyMessages();
 
@@ -42,7 +47,8 @@ export async function processIncomingMessage(message) {
     timestamp: new Date().toISOString()
   };
 
-  console.log(`[TelegramBot] Mensaje recibido de ${userName}: ${text}`);
+  console.log(`[TelegramBot] Mensaje guardado de ${userName}: ${text}`);
+  console.log('[TelegramBot] Estado actual:', dailyMessages);
 }
 
 // Función para configurar webhook

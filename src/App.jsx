@@ -538,7 +538,7 @@ function WeatherModal({ isOpen, onClose, weatherData, selectedPeriod }) {
   );
 }
 
-function WeatherWidget() {
+function WeatherWidget({ onHeightChange }) {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -547,6 +547,7 @@ function WeatherWidget() {
   const [weatherSummary, setWeatherSummary] = useState('');
   const [weatherSummaryTitle, setWeatherSummaryTitle] = useState('');
   const [summaryLoading, setSummaryLoading] = useState(false);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     async function fetchWeather() {
@@ -888,9 +889,26 @@ RESUMEN: [resumen específico del día con humor negro]`;
     return { title: 'Resumen del tiempo hoy', summary };
   }
 
+  useEffect(() => {
+    if (containerRef.current && onHeightChange) {
+      const updateHeight = () => {
+        const height = containerRef.current.offsetHeight;
+        onHeightChange(height);
+      };
+      
+      updateHeight();
+      
+      // También actualizar cuando cambie el contenido
+      const resizeObserver = new ResizeObserver(updateHeight);
+      resizeObserver.observe(containerRef.current);
+      
+      return () => resizeObserver.disconnect();
+    }
+  }, [weather, loading, error, onHeightChange]);
+
   if (loading) {
     return (
-      <div className="weather-dashboard">
+      <div className="weather-dashboard" ref={containerRef}>
         <h1 className="weather-title">Tiempo ahora</h1>
         <div className="weather-placeholder">Cargando...</div>
       </div>
@@ -899,7 +917,7 @@ RESUMEN: [resumen específico del día con humor negro]`;
 
   if (error || !weather) {
     return (
-      <div className="weather-dashboard">
+      <div className="weather-dashboard" ref={containerRef}>
         <h1 className="weather-title">Tiempo ahora</h1>
         <div className="weather-placeholder">{error || 'No disponible'}</div>
       </div>
@@ -914,7 +932,7 @@ RESUMEN: [resumen específico del día con humor negro]`;
 
   return (
     <>
-      <div className="weather-dashboard">
+      <div className="weather-dashboard" ref={containerRef}>
         <h1 className="weather-title">Tiempo ahora</h1>
         <div className="weather-content">
           <div className="weather-main">
@@ -965,6 +983,7 @@ function App() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [hoyHeight, setHoyHeight] = useState(0);
+  const [weatherHeight, setWeatherHeight] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
 
@@ -1002,7 +1021,7 @@ function App() {
         )}
       </div>
       
-      <WeatherWidget />
+      <WeatherWidget onHeightChange={setWeatherHeight} />
       
       <TodayEvents events={events} onHeightChange={setHoyHeight} />
       
@@ -1025,7 +1044,7 @@ function App() {
         document.body
       )}
       
-      <NotesWidget />
+      <NotesWidget weatherHeight={weatherHeight} />
     </>
   );
 }

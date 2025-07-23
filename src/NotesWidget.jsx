@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getDailyMessages, getBotInfo } from './TelegramBot';
 
-function NotesWidget() {
+function NotesWidget({ weatherHeight }) {
   const [messages, setMessages] = useState({});
   const [botInfo, setBotInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +29,13 @@ function NotesWidget() {
     return () => clearInterval(interval);
   }, []);
 
+  // Actualizar posición cuando cambie la altura del weather
+  useEffect(() => {
+    if (weatherHeight) {
+      console.log('[NotesWidget] Altura del weather actualizada:', weatherHeight);
+    }
+  }, [weatherHeight]);
+
   // Función para formatear la hora
   const formatTime = (timestamp) => {
     return new Date(timestamp).toLocaleTimeString('es-ES', {
@@ -49,7 +56,12 @@ function NotesWidget() {
   const messageCount = Object.keys(messages).length;
 
   return (
-    <div className="notes-dashboard">
+    <div 
+      className="notes-dashboard"
+      style={{ 
+        top: weatherHeight ? `${weatherHeight + 40}px` : '280px'
+      }}
+    >
       <h1 className="notes-title">Notas del día</h1>
       
       {botInfo && (
