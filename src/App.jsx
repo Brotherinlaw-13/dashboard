@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { fetchAllEvents } from './EventFetcher';
-import VitaminTracker from './VitaminTracker';
 import './App.css';
 
 function capitalize(str) {
@@ -774,14 +773,14 @@ function WeatherWidget() {
 
       console.log('Weather data for OpenAI:', weatherData);
 
-      const prompt = `Eres un colega majo que explica el tiempo de HOY con humor negro y sarcasmo. Hablas de forma cercana pero con toque de humor ácido. Usa expresiones como 'oye', 'la cosa es que', 'lo suyo sería', pero añade algo de humor negro sobre el tiempo. NO te despidas al final.
+      const prompt = `Eres un colega majo que explica el tiempo de HOY con humor negro y sarcasmo. SIEMPRE empieza con "Hoy" y ve directo al grano. Añade algo de humor negro sobre el tiempo. NO te despidas al final.
 
 Aquí tienes el tiempo hora por hora para HOY:
 ${weatherData.map(hour => `${hour.time}: ${hour.temperature}°C, ${hour.condition}`).join('\n')}
 
-Sé MUY específico con las horas. Si va a llover, di exactamente a qué hora y con qué probabilidad. Por ejemplo: "nublado pero a las 12 de la mañana y a las 3 de la tarde lloverá con bastante posibilidad". 
+Sé MUY específico con las horas. Si va a llover, di exactamente a qué hora y con qué probabilidad. Por ejemplo: "Hoy nublado pero a las 12 de la mañana y a las 3 de la tarde lloverá con bastante posibilidad". 
 
-Analiza los datos y da un resumen práctico pero con humor negro. Máximo 2 emojis. Máximo 3-4 frases. Ve directo al grano, sin saludos. Menciona horas específicas cuando sea relevante.
+Analiza los datos y da un resumen práctico pero con humor negro. Máximo 2 emojis. Máximo 3-4 frases. SIEMPRE empieza con "Hoy". Menciona horas específicas cuando sea relevante.
 
 Formato de respuesta:
 TÍTULO: [un título corto y atractivo sobre el tiempo de HOY]
@@ -1024,8 +1023,6 @@ function App() {
         />,
         document.body
       )}
-      
-      <VitaminTracker />
     </>
   );
 }
