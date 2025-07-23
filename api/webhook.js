@@ -4,6 +4,7 @@ export default async function handler(req, res) {
   console.log('[Webhook] Request recibido:', req.method, req.url);
   console.log('[Webhook] Token disponible:', !!BOT_TOKEN);
   console.log('[Webhook] Token:', BOT_TOKEN ? BOT_TOKEN.substring(0, 10) + '...' : 'NO TOKEN');
+  console.log('[Webhook] Todas las variables de entorno:', Object.keys(process.env).filter(key => key.includes('TELEGRAM')));
 
   // Solo permitir POST requests
   if (req.method !== 'POST') {
@@ -22,25 +23,7 @@ export default async function handler(req, res) {
 
     console.log('[Webhook] Mensaje recibido:', message);
 
-    // Enviar confirmación al usuario si tenemos token
-    if (BOT_TOKEN && message.chat && message.chat.id) {
-      try {
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            chat_id: message.chat.id,
-            text: `✅ Nota recibida: "${message.text}"`
-          })
-        });
-      } catch (error) {
-        console.error('[Webhook] Error enviando confirmación:', error);
-      }
-    }
-
-    // Responder OK
+    // Por ahora, solo responder OK sin hacer nada más
     console.log('[Webhook] Respuesta exitosa');
     res.status(200).json({ 
       message: 'OK',
