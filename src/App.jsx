@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { fetchAllEvents } from './EventFetcher';
+import VitaminTracker from './VitaminTracker';
 import './App.css';
 
 function capitalize(str) {
@@ -773,16 +774,18 @@ function WeatherWidget() {
 
       console.log('Weather data for OpenAI:', weatherData);
 
-      const prompt = `Eres un colega majo que explica el tiempo de HOY (no mañana). Hablas de forma cercana y amigable, con expresiones naturales como 'oye', 'ojo', 'la cosa es que', 'lo suyo sería'. Puedes meter algo de humor si queda natural. Sé claro, directo y práctico. No te enrolles, pero tampoco seas seco.
+      const prompt = `Eres un colega majo que explica el tiempo de HOY con humor negro y sarcasmo. Hablas de forma cercana pero con toque de humor ácido. Usa expresiones como 'oye', 'la cosa es que', 'lo suyo sería', pero añade algo de humor negro sobre el tiempo. NO te despidas al final.
 
 Aquí tienes el tiempo hora por hora para HOY:
 ${weatherData.map(hour => `${hour.time}: ${hour.temperature}°C, ${hour.condition}`).join('\n')}
 
-Genera un resumen general del tiempo de HOY, no detalles hora por hora. Máximo 2 emojis y consejos prácticos. Máximo 2-3 frases. Ve directo al grano, sin saludos. NO menciones horas específicas, solo describe cómo va a estar el día en general.
+Sé MUY específico con las horas. Si va a llover, di exactamente a qué hora y con qué probabilidad. Por ejemplo: "nublado pero a las 12 de la mañana y a las 3 de la tarde lloverá con bastante posibilidad". 
+
+Analiza los datos y da un resumen práctico pero con humor negro. Máximo 2 emojis. Máximo 3-4 frases. Ve directo al grano, sin saludos. Menciona horas específicas cuando sea relevante.
 
 Formato de respuesta:
 TÍTULO: [un título corto y atractivo sobre el tiempo de HOY]
-RESUMEN: [resumen general del día de HOY]`;
+RESUMEN: [resumen específico del día con humor negro]`;
 
       console.log('OpenAI API Key available:', !!import.meta.env.VITE_OPENAI_API_KEY);
 
@@ -941,27 +944,7 @@ RESUMEN: [resumen general del día de HOY]`;
             )}
           </div>
           
-          {weather.hourly && weather.hourly.length > 0 && (
-            <div className="weather-forecast">
-              <div className="forecast-title">Hoy:</div>
-              <div className="forecast-hours">
-                {weather.hourly.map((hour, index) => (
-                  <div key={index} className="forecast-hour clickable" onClick={() => handlePeriodClick(hour.period)}>
-                    <div className="forecast-time">{hour.period}</div>
-                    <div className="forecast-icon">
-                      <img 
-                        src={`https://openweathermap.org/img/wn/${hour.icon}.png`}
-                        alt={hour.condition}
-                        width="32"
-                        height="32"
-                      />
-                    </div>
-                    <div className="forecast-temp">{hour.temperature}°</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+
         </div>
       </div>
 
@@ -1041,6 +1024,8 @@ function App() {
         />,
         document.body
       )}
+      
+      <VitaminTracker />
     </>
   );
 }
