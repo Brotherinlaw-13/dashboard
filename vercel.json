@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/webhook.js": {
+      "maxDuration": 10
+    },
+    "api/setup-webhook.js": {
+      "maxDuration": 10
+    }
+  },
+  "env": {
+    "VITE_TELEGRAM_BOT_TOKEN": "@telegram_bot_token"
+  }
+} 

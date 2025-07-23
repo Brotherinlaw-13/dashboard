@@ -1,29 +1,20 @@
-# Example .env.local for Google Calendar Dashboard
+# Environment Variables Example
 
-Copy the following into a file named `.env.local` in your `mi-dashboard/` directory and fill in your calendar details:
-
-```env
-VITE_CALENDARS=[
-  {
-    "name": "Family",
-    "url": "https://calendar.google.com/calendar/ical/your-family-calendar-url.ics",
-    "color": "#FF5733"
-  },
-  {
-    "name": "Work",
-    "url": "https://calendar.google.com/calendar/ical/your-work-calendar-url.ics",
-    "color": "#3375FF"
-  }
-]
-
-# Google API Key for Geocoding (required for weather widget)
+## Google Calendar API
 VITE_GOOGLE_API_KEY=your_google_api_key_here
+VITE_GOOGLE_CALENDAR_IDS=["calendar_id_1", "calendar_id_2"]
 
-# OpenAI API Key for weather summaries (optional - will use fallback if not provided)
+## OpenAI API (for weather summaries)
 VITE_OPENAI_API_KEY=your_openai_api_key_here
-```
 
-- You can add more calendar objects to the array as needed.
-- Each calendar must have a `name`, `url`, and `color` (hex code).
-- The Google API key is required for the weather widget to work.
-- The OpenAI API key is optional - if not provided, the weather widget will use a simple fallback summary. 
+## Telegram Bot (for notes widget)
+VITE_TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
+
+## Instructions:
+1. Copy this file to `.env.local`
+2. Replace the placeholder values with your actual API keys
+3. For Telegram Bot:
+   - Create a bot with @BotFather on Telegram
+   - Get the bot token and add it to VITE_TELEGRAM_BOT_TOKEN
+   - Deploy to Vercel and the webhook will be automatically configured
+   - The webhook URL will be: https://your-app.vercel.app/api/webhook 

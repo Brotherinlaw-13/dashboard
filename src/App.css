@@ -1041,3 +1041,123 @@ h1 {
   text-decoration: line-through;
   font-weight: 500;
 }
+
+/* Notes Widget Styles */
+.notes-dashboard {
+  position: fixed;
+  z-index: 1;
+  top: 280px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 380px;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  padding: 12px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.22);
+}
+
+@media (max-width: 1200px) {
+  .notes-dashboard {
+    position: relative;
+    top: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 380px;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 700px) {
+  .notes-dashboard {
+    left: 0;
+    right: 0;
+    transform: none;
+    width: auto;
+    margin: 20px 10px 0 10px;
+    border-radius: 12px;
+  }
+}
+
+.notes-title {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  text-align: center;
+  font-weight: 600;
+  color: #333;
+}
+
+.bot-info {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.bot-name {
+  font-size: 0.8rem;
+  color: #666;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-family: monospace;
+}
+
+.notes-content {
+  margin-bottom: 12px;
+}
+
+.notes-placeholder {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 20px 0;
+}
+
+.notes-instruction {
+  font-size: 0.8rem;
+  margin-top: 8px;
+  color: #777;
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.note-item {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.note-author {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.note-time {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.note-message {
+  font-size: 0.9rem;
+  color: #444;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+
