@@ -1,32 +1,65 @@
 import { useState, useEffect } from 'react';
-import { getDailyMessages, getBotInfo } from './TelegramBot';
 
 function NotesWidget({ weatherHeight }) {
   const [messages, setMessages] = useState({});
-  const [botInfo, setBotInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [newMessage, setNewMessage] = useState('');
+  const [userName, setUserName] = useState('');
 
-  // Función para cargar mensajes
-  const loadMessages = () => {
-    const dailyMessages = getDailyMessages();
-    setMessages(dailyMessages);
+  // Función para obtener la fecha actual en formato YYYY-MM-DD
+  const getCurrentDate = () => {
+    return new Date().toISOString().split('T')[0];
   };
 
-  // Función para obtener información del bot
-  const loadBotInfo = async () => {
-    const info = await getBotInfo();
-    setBotInfo(info);
+  // Función para cargar mensajes desde localStorage
+  const loadMessages = () => {
+    const savedDate = localStorage.getItem('notesDate');
+    const currentDate = getCurrentDate();
+    
+    // Si la fecha guardada es diferente a la actual, resetear todo
+    if (savedDate !== currentDate) {
+      localStorage.setItem('notesDate', currentDate);
+      localStorage.removeItem('notesMessages');
+      setMessages({});
+      return;
+    }
+    
+    // Si es el mismo día, cargar el estado guardado
+    const savedMessages = localStorage.getItem('notesMessages');
+    if (savedMessages) {
+      setMessages(JSON.parse(savedMessages));
+    }
+  };
+
+  // Función para guardar mensajes en localStorage
+  const saveMessages = (newMessages) => {
+    localStorage.setItem('notesMessages', JSON.stringify(newMessages));
+    localStorage.setItem('notesDate', getCurrentDate());
+  };
+
+  // Función para añadir un mensaje
+  const addMessage = () => {
+    if (!newMessage.trim() || !userName.trim()) return;
+
+    const userId = Date.now().toString(); // ID único temporal
+    const newMessages = {
+      ...messages,
+      [userId]: {
+        name: userName,
+        message: newMessage,
+        timestamp: new Date().toISOString()
+      }
+    };
+
+    setMessages(newMessages);
+    saveMessages(newMessages);
+    setNewMessage('');
   };
 
   // Cargar datos iniciales
   useEffect(() => {
     loadMessages();
-    loadBotInfo();
     setLoading(false);
-
-    // Actualizar cada 30 segundos
-    const interval = setInterval(loadMessages, 30000);
-    return () => clearInterval(interval);
   }, []);
 
   // Actualizar posición cuando cambie la altura del weather
@@ -64,18 +97,35 @@ function NotesWidget({ weatherHeight }) {
     >
       <h1 className="notes-title">Notas del día</h1>
       
-      {botInfo && (
-        <div className="bot-info">
-          <span className="bot-name">@{botInfo.username}</span>
+      <div className="notes-input">
+        <input
+          type="text"
+          placeholder="Tu nombre"
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+          className="notes-name-input"
+        />
+        <div className="notes-message-input">
+          <input
+            type="text"
+            placeholder="Escribe tu nota..."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && addMessage()}
+            className="notes-text-input"
+          />
+          <button onClick={addMessage} className="notes-add-btn">
+            +
+          </button>
         </div>
-      )}
+      </div>
 
       <div className="notes-content">
-        {messageCount === 0 ? (
+        {Object.keys(messages).length === 0 ? (
           <div className="notes-placeholder">
             No hay notas hoy
             <div className="notes-instruction">
-              Envía un mensaje al bot para agregar una nota
+              Escribe tu nombre y añade una nota
             </div>
           </div>
         ) : (
@@ -92,7 +142,6 @@ function NotesWidget({ weatherHeight }) {
           </div>
         )}
       </div>
-
 
     </div>
   );

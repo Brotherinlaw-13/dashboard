@@ -1116,6 +1116,54 @@ h1 {
   padding: 20px 0;
 }
 
+.notes-input {
+  margin-bottom: 12px;
+}
+
+.notes-name-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+.notes-message-input {
+  display: flex;
+  gap: 6px;
+}
+
+.notes-text-input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+}
+
+.notes-add-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.notes-add-btn:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
 .notes-instruction {
   font-size: 0.8rem;
   margin-top: 8px;
