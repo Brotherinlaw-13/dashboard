@@ -1,6 +1,9 @@
 export default async function handler(req, res) {
+  const BOT_TOKEN = process.env.VITE_TELEGRAM_BOT_TOKEN;
+  
   console.log('[Webhook] Request recibido:', req.method, req.url);
-  console.log('[Webhook] Body:', JSON.stringify(req.body, null, 2));
+  console.log('[Webhook] Token disponible:', !!BOT_TOKEN);
+  console.log('[Webhook] Token:', BOT_TOKEN ? BOT_TOKEN.substring(0, 10) + '...' : 'NO TOKEN');
 
   // Solo permitir POST requests
   if (req.method !== 'POST') {
@@ -19,12 +22,31 @@ export default async function handler(req, res) {
 
     console.log('[Webhook] Mensaje recibido:', message);
 
-    // Por ahora, solo responder OK sin procesar
+    // Enviar confirmación al usuario si tenemos token
+    if (BOT_TOKEN && message.chat && message.chat.id) {
+      try {
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: message.chat.id,
+            text: `✅ Nota recibida: "${message.text}"`
+          })
+        });
+      } catch (error) {
+        console.error('[Webhook] Error enviando confirmación:', error);
+      }
+    }
+
+    // Responder OK
     console.log('[Webhook] Respuesta exitosa');
     res.status(200).json({ 
       message: 'OK',
       received: message.text,
-      from: message.from?.first_name || 'Unknown'
+      from: message.from?.first_name || 'Unknown',
+      tokenAvailable: !!BOT_TOKEN
     });
 
   } catch (error) {
