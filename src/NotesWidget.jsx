@@ -1,87 +1,48 @@
 import { useState, useEffect } from 'react';
+import { getDailyMessages, getBotInfo } from './TelegramBot';
 
 function NotesWidget({ weatherHeight }) {
   const [messages, setMessages] = useState({});
+  const [botInfo, setBotInfo] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [newMessage, setNewMessage] = useState('');
-  const [userName, setUserName] = useState('');
 
-  // Función para obtener la fecha actual en formato YYYY-MM-DD
-  const getCurrentDate = () => {
-    return new Date().toISOString().split('T')[0];
-  };
-
-  // Función para cargar mensajes desde localStorage
+  // Cargar mensajes desde TelegramBot helper
   const loadMessages = () => {
-    const savedDate = localStorage.getItem('notesDate');
-    const currentDate = getCurrentDate();
-    
-    // Si la fecha guardada es diferente a la actual, resetear todo
-    if (savedDate !== currentDate) {
-      localStorage.setItem('notesDate', currentDate);
-      localStorage.removeItem('notesMessages');
-      setMessages({});
-      return;
-    }
-    
-    // Si es el mismo día, cargar el estado guardado
-    const savedMessages = localStorage.getItem('notesMessages');
-    if (savedMessages) {
-      setMessages(JSON.parse(savedMessages));
-    }
+    const dailyMessages = getDailyMessages();
+    setMessages(dailyMessages);
   };
 
-  // Función para guardar mensajes en localStorage
-  const saveMessages = (newMessages) => {
-    localStorage.setItem('notesMessages', JSON.stringify(newMessages));
-    localStorage.setItem('notesDate', getCurrentDate());
-  };
-
-  // Función para añadir un mensaje
-  const addMessage = () => {
-    if (!newMessage.trim() || !userName.trim()) return;
-
-    const userId = Date.now().toString(); // ID único temporal
-    const newMessages = {
-      ...messages,
-      [userId]: {
-        name: userName,
-        message: newMessage,
-        timestamp: new Date().toISOString()
-      }
-    };
-
-    setMessages(newMessages);
-    saveMessages(newMessages);
-    setNewMessage('');
+  // Cargar info del bot (nombre de usuario)
+  const loadBotInfo = async () => {
+    const info = await getBotInfo();
+    setBotInfo(info);
   };
 
   // Cargar datos iniciales
   useEffect(() => {
     loadMessages();
+    loadBotInfo();
     setLoading(false);
+
+    // Actualizar cada 30 s
+    const interval = setInterval(loadMessages, 30_000);
+    return () => clearInterval(interval);
   }, []);
 
-  // Actualizar posición cuando cambie la altura del weather
+  // Actualizar posición cuando cambie la altura del widget del tiempo
   useEffect(() => {
     if (weatherHeight) {
-      console.log('[NotesWidget] Altura del weather actualizada:', weatherHeight);
+      console.log('[NotesWidget] Altura weather actualizada:', weatherHeight);
     }
   }, [weatherHeight]);
 
-  // Función para formatear la hora
-  const formatTime = (timestamp) => {
-    return new Date(timestamp).toLocaleTimeString('es-ES', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const formatTime = (ts) => new Date(ts).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
   if (loading) {
     return (
       <div className="notes-dashboard">
         <h1 className="notes-title">Notas del día</h1>
-        <div className="notes-placeholder">Cargando...</div>
+        <div className="notes-placeholder">Cargando…</div>
       </div>
     );
   }
@@ -89,49 +50,30 @@ function NotesWidget({ weatherHeight }) {
   const messageCount = Object.keys(messages).length;
 
   return (
-    <div 
+    <div
       className="notes-dashboard"
-      style={{ 
-        top: weatherHeight ? `${weatherHeight + 40}px` : '280px'
-      }}
+      style={{ top: weatherHeight ? `${weatherHeight + 40}px` : '280px' }}
     >
       <h1 className="notes-title">Notas del día</h1>
-      
-      <div className="notes-input">
-        <input
-          type="text"
-          placeholder="Tu nombre"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-          className="notes-name-input"
-        />
-        <div className="notes-message-input">
-          <input
-            type="text"
-            placeholder="Escribe tu nota..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && addMessage()}
-            className="notes-text-input"
-          />
-          <button onClick={addMessage} className="notes-add-btn">
-            +
-          </button>
+
+      {botInfo && (
+        <div className="bot-info">
+          <span className="bot-name">@{botInfo.username}</span>
         </div>
-      </div>
+      )}
 
       <div className="notes-content">
-        {Object.keys(messages).length === 0 ? (
+        {messageCount === 0 ? (
           <div className="notes-placeholder">
             No hay notas hoy
             <div className="notes-instruction">
-              Escribe tu nombre y añade una nota
+              Envía un mensaje al bot para agregar una nota
             </div>
           </div>
         ) : (
           <div className="notes-list">
-            {Object.entries(messages).map(([userId, data]) => (
-              <div key={userId} className="note-item">
+            {Object.entries(messages).map(([uid, data]) => (
+              <div key={uid} className="note-item">
                 <div className="note-header">
                   <span className="note-author">{data.name}</span>
                   <span className="note-time">{formatTime(data.timestamp)}</span>
@@ -142,7 +84,6 @@ function NotesWidget({ weatherHeight }) {
           </div>
         )}
       </div>
-
     </div>
   );
 }
