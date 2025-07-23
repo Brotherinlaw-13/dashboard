@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { fetchAllEvents } from './EventFetcher';
-import NotesWidget from './NotesWidget';
 import './App.css';
 
 function capitalize(str) {
@@ -1044,7 +1043,6 @@ function App() {
         document.body
       )}
       
-      <NotesWidget weatherHeight={weatherHeight} />
     </>
   );
 }
