@@ -62,18 +62,28 @@ export async function fetchAllEvents() {
     // Combine all events from all calendars
     const allEvents = allCalendarEvents.flat();
     const now = new Date();
-    // Only future or ongoing events
-    const upcoming = allEvents.filter(e => e.end ? e.end >= now : e.start >= now);
-    // Sort: ongoing (now between start and end) first, then by start time
-    const ongoing = upcoming.filter(e => e.start <= now && (e.end ? e.end >= now : false));
-    const future = upcoming.filter(e => !(e.start <= now && (e.end ? e.end >= now : false)));
-    future.sort((a, b) => a.start - b.start);
-    // Pin ongoing events to top and limit to 11
-    const sorted = [...ongoing, ...future];
-    return sorted.map(e => ({
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // Mantén los eventos que aún no han finalizado antes de hoy
+    const relevant = allEvents.filter(e => {
+      if (e.end) {
+        return e.end >= todayStart; // El evento ocurre hoy o en el futuro
+      }
+      // Si no hay fecha de fin explícita, usa la fecha de inicio
+      return e.start >= todayStart;
+    });
+
+    // Marca los eventos en curso
+    const enriched = relevant.map(e => ({
       ...e,
       isOngoing: e.start <= now && (e.end ? e.end >= now : false),
     }));
+
+    // Ordena: primero los eventos en curso y luego por hora de inicio
+    const ongoing = enriched.filter(e => e.isOngoing);
+    const rest = enriched.filter(e => !e.isOngoing).sort((a, b) => a.start - b.start);
+
+    return [...ongoing, ...rest];
   } catch (err) {
     console.error('Failed to fetch Google Calendar events', err);
     return [];

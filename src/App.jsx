@@ -59,7 +59,17 @@ function EventItem({ event }) {
 }
 
 function TodayEvents({ events, onHeightChange }) {
-  const todayEvents = events.filter(event => isToday(event.start));
+  const todayEvents = events.filter(event => {
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setDate(endOfDay.getDate() + 1);
+
+    const eventEnd = event.end || event.start;
+
+    // Incluye el evento si se solapa con el día de hoy
+    return event.start < endOfDay && eventEnd >= startOfDay;
+  }).sort((a, b) => a.start - b.start);
   const containerRef = useRef(null);
   
   useEffect(() => {
@@ -1010,7 +1020,8 @@ function App() {
         ) : (
           <div className="event-list">
             {events
-              .filter(event => !isToday(event.start))
+              .filter(event => !isToday(event.start)) // excluir hoy
+              .filter(event => !event.isOngoing)      // excluir eventos en curso que empezaron antes
               .filter(event => !event.title.toLowerCase().includes('basura'))
               .slice(0, 11)
               .map((event, i) => (
