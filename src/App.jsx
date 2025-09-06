@@ -33,11 +33,12 @@ function isSameDay(date1, date2) {
 
 function EventItem({ event }) {
   const isBasura = event.title.toLowerCase().includes('basura');
+  const isClub = event.title.toLowerCase().startsWith('club');
   return (
     <div className="event-item compact">
       <span
         className="event-accent"
-        style={{ background: isBasura ? '#4CAF50' : event.color }}
+        style={{ background: isBasura ? '#4CAF50' : isClub ? '#9C27B0' : event.color }}
       />
       <div className="event-details compact-details">
         <div className="event-title-date-row">
@@ -784,18 +785,18 @@ function WeatherWidget({ onHeightChange }) {
 
       console.log('Weather data for OpenAI:', weatherData);
 
-      const prompt = `Eres un colega majo que explica el tiempo de HOY con humor negro y sarcasmo. SIEMPRE empieza con "Hoy" y ve directo al grano. Añade algo de humor negro sobre el tiempo. NO te despidas al final.
+      const prompt = `Eres un amigo optimista que explica el tiempo de HOY con humor ligero y positivismo. SIEMPRE empieza con "Hoy" y ve directo al grano. Añade algo de humor que arranque una sonrisa sin ser cursi. NO te despidas al final.
 
 Aquí tienes el tiempo hora por hora para HOY:
 ${weatherData.map(hour => `${hour.time}: ${hour.temperature}°C, ${hour.condition}`).join('\n')}
 
 Sé MUY específico con las horas. Si va a llover, di exactamente a qué hora y con qué probabilidad. Por ejemplo: "Hoy nublado pero a las 12 de la mañana y a las 3 de la tarde lloverá con bastante posibilidad". 
 
-Analiza los datos y da un resumen práctico pero con humor negro. Máximo 2 emojis. Máximo 3-4 frases. SIEMPRE empieza con "Hoy". Menciona horas específicas cuando sea relevante.
+Analiza los datos y da un resumen práctico pero con humor positivo y optimista. Máximo 2 emojis. Máximo 3-4 frases. SIEMPRE empieza con "Hoy". Menciona horas específicas cuando sea relevante.
 
 Formato de respuesta:
 TÍTULO: [un título corto y atractivo sobre el tiempo de HOY]
-RESUMEN: [resumen específico del día con humor negro]`;
+RESUMEN: [resumen específico del día con humor positivo]`;
 
       console.log('OpenAI API Key available:', !!import.meta.env.VITE_OPENAI_API_KEY);
 
@@ -1023,6 +1024,7 @@ function App() {
               .filter(event => !isToday(event.start)) // excluir hoy
               .filter(event => !event.isOngoing)      // excluir eventos en curso que empezaron antes
               .filter(event => !event.title.toLowerCase().includes('basura'))
+              .filter(event => !event.title.toLowerCase().startsWith('club'))
               .slice(0, 11)
               .map((event, i) => (
                 <EventItem event={event} key={i} />
