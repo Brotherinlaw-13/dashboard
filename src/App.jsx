@@ -902,8 +902,10 @@ RESUMEN: [resumen específico del día con humor positivo]`;
   useEffect(() => {
     if (containerRef.current && onHeightChange) {
       const updateHeight = () => {
-        const height = containerRef.current.offsetHeight;
-        onHeightChange(height);
+        if (containerRef.current) {
+          const height = containerRef.current.offsetHeight;
+          onHeightChange(height);
+        }
       };
       
       updateHeight();
@@ -1023,8 +1025,8 @@ function App() {
             {events
               .filter(event => !isToday(event.start)) // excluir hoy
               .filter(event => !event.isOngoing)      // excluir eventos en curso que empezaron antes
-              .filter(event => !event.title.toLowerCase().includes('basura'))
-              .filter(event => !event.title.toLowerCase().startsWith('club'))
+              .filter(event => event.title && !event.title.toLowerCase().includes('basura'))
+              .filter(event => event.title && !event.title.toLowerCase().startsWith('club'))
               .slice(0, 11)
               .map((event, i) => (
                 <EventItem event={event} key={i} />
