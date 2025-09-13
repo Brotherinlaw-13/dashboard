@@ -24,7 +24,7 @@ function getCalendarColor(calendarId) {
 
 function parseGoogleEvent(event, calendarId) {
   return {
-    title: event.summary,
+    title: event.summary || 'Evento sin título', // Provide fallback for undefined summary
     start: new Date(event.start.dateTime || event.start.date),
     end: event.end ? new Date(event.end.dateTime || event.end.date) : null,
     calendarId,

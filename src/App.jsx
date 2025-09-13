@@ -32,6 +32,11 @@ function isSameDay(date1, date2) {
 }
 
 function EventItem({ event }) {
+  // Handle cases where event.title might be undefined
+  if (!event || !event.title) {
+    return null; // Don't render anything if event or title is missing
+  }
+  
   const isBasura = event.title.toLowerCase().includes('basura');
   const isClub = event.title.toLowerCase().startsWith('club');
   return (
