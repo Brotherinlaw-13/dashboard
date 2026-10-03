@@ -1,149 +1,193 @@
-// Pantalla de cocina: estilo tarjetas oscuras (Mushroom/Apple Home). Iconos SVG: la Pi no tiene fuente de emojis.
-import { useEffect, useState, useCallback } from 'react';
+// Pantalla de cocina. Réplica del diseño "Panel de casa" de Diego (estilo Apple Home, cristal claro),
+// con datos reales: calendarios (Vercel) y casa (API local de la Pi, 127.0.0.1:8787).
+import { useEffect, useRef, useState, useCallback } from 'react';
 import './cocina.css';
 
 const API = 'http://127.0.0.1:8787';
 const OCULTAR = ['Salon1', 'Salon2'];
 const NOMBRE = { 'Habitacion Dante': 'Dante', 'Habitacion Tristan': 'Tristán', 'Habitacion Paichons': 'Papás', 'Salon': 'Salón' };
+const ORDEN = ['Salon', 'Habitacion Dante', 'Habitacion Tristan', 'Habitacion Paichons'];
 const LUZ = { Lampara: 'Lámpara', Led: 'Led', Luz: 'Luz' };
-const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
-const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const DOW = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+const pad = n => String(n).padStart(2, '0');
+const hhmm = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const fmt = n => (n == null ? '–' : Number(n).toFixed(1).replace('.', ','));
+const limpio = t => (t || '').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\uFE0F]/gu, '').trim();
+const mismoDia = (a, b) => a.toDateString() === b.toDateString();
+const colorCal = e => (/luke/i.test(e.calendarId || '') ? '#FF9F0A' : '#34C759');
+const quien = e => (/luke/i.test(e.calendarId || '') ? "St Luke's" : 'Familia');
 
-const Ico = {
-  luz: <svg viewBox="0 0 24 24"><path d="M9 21h6M10 18h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.9V16h5v-.2c0-.8.4-1.5 1-1.9A6 6 0 0 0 12 3z"/></svg>,
-  fuego: <svg viewBox="0 0 24 24"><path d="M12 3s5 4.5 5 9.5a5 5 0 0 1-10 0C7 10 9 8.5 9 8.5s.5 2.5 2 3c0-3 1-6.5 1-8.5z"/></svg>,
-  robot: <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="9" r="2"/><path d="M7 15h10"/></svg>,
-  termo: <svg viewBox="0 0 24 24"><path d="M10 4a2 2 0 0 1 4 0v9.5a4 4 0 1 1-4 0z"/></svg>,
+const ICO = {
+  fuego: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.3 1.5 1 2.5 2 3 0-3 .5-6 1-8.5z" /></svg>,
+  luz: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6" /><path d="M10 21h4" /><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" /></svg>,
+  play: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" /></svg>,
+  casa: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-7 9 7" /><path d="M5 10v10h14V10" /></svg>,
+  pin: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" /></svg>,
 };
 
-const hhmm = d => d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-const mismoDia = (a, b) => a.toDateString() === b.toDateString();
-
-function Reloj() {
-  const [ahora, setAhora] = useState(new Date());
-  useEffect(() => { const t = setInterval(() => setAhora(new Date()), 10000); return () => clearInterval(t); }, []);
-  return (
-    <div className="k-reloj">
-      <div className="k-hora">{hhmm(ahora)}</div>
-      <div className="k-fecha">{DIAS[ahora.getDay()]} {ahora.getDate()} de {MESES[ahora.getMonth()]}</div>
-    </div>
-  );
+function useAhora(ms) {
+  const [n, setN] = useState(new Date());
+  useEffect(() => { const t = setInterval(() => setN(new Date()), ms); return () => clearInterval(t); }, [ms]);
+  return n;
 }
 
-function Agenda({ events }) {
-  const hoy = new Date();
-  const deHoy = events.filter(e => mismoDia(e.start, hoy) || e.isOngoing);
-  const prox = events.filter(e => !mismoDia(e.start, hoy) && !e.isOngoing && e.start > hoy)
-    .filter(e => !/^club/i.test(e.title)).slice(0, 7);
-  const linea = (e, i, conDia) => (
-    <div className="k-ev" key={i}>
-      <span className="k-ev-barra" style={{ background: e.color }} />
-      <div className="k-ev-txt">
-        <div className="k-ev-titulo">{e.title.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\uFE0F]/gu, '').trim()}</div>
-        <div className="k-ev-cuando">
-          {conDia && `${DIAS[e.start.getDay()].slice(0, 3)} ${e.start.getDate()}`}
-          {conDia && !e.allDay && ' · '}
-          {!e.allDay ? hhmm(e.start) : (!conDia ? 'todo el día' : '')}
-        </div>
-      </div>
-    </div>
-  );
+function Hoy({ events }) {
+  const ahora = useAhora(1000);
+  let fecha = new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).format(ahora);
+  fecha = fecha.charAt(0).toUpperCase() + fecha.slice(1);
+  const deHoy = events.filter(e => mismoDia(e.start, ahora) || e.isOngoing).slice(0, 5);
+  let siguiente = false;
   return (
-    <div className="k-col-izq">
-      <Reloj />
-      <div className="k-card">
-        <div className="k-card-tit">Hoy</div>
-        {deHoy.length ? deHoy.map((e, i) => linea(e, i, false)) : <div className="k-vacio">Nada en el calendario</div>}
+    <section className="c-card c-hoy">
+      <div>
+        <div className="c-fecha">{fecha}</div>
+        <div className="c-reloj"><span className="c-hora">{hhmm(ahora)}</span><span className="c-seg">{pad(ahora.getSeconds())}</span></div>
       </div>
-      <div className="k-card k-crece">
-        <div className="k-card-tit">Próximos</div>
-        {prox.map((e, i) => linea(e, i, true))}
-      </div>
-    </div>
-  );
-}
-
-function Casa() {
-  const [casa, setCasa] = useState(null);
-  const [pend, setPend] = useState({});
-  const cargar = useCallback(async () => {
-    try { const r = await fetch(`${API}/casa`, { cache: 'no-store' }); setCasa(r.ok ? await r.json() : null); }
-    catch { setCasa(null); }
-  }, []);
-  useEffect(() => { cargar(); const t = setInterval(cargar, 2000); return () => clearInterval(t); }, [cargar]);
-
-  async function accion(clave, path, body, optimista) {
-    if (optimista) setCasa(c => (c ? optimista(structuredClone(c)) : c));
-    setPend(p => ({ ...p, [clave]: Date.now() }));
-    try { await fetch(`${API}${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) }); } catch { /* */ }
-    setTimeout(() => setPend(p => { const n = { ...p }; delete n[clave]; return n; }), 8000);
-  }
-  if (!casa) return <div className="k-col-der"><div className="k-card k-vacio">La casa sólo se ve desde la pantalla de la cocina</div></div>;
-
-  const ts = casa.ts || {};
-  const hiveViejo = !ts.hive || Date.now() / 1000 - ts.hive > 180;
-  const zonas = (casa.hive || []).filter(z => !OCULTAR.includes(z.nombre));
-  const luces = (casa.luces || []).filter(l => l.online);
-  const robo = casa.robotina;
-  const caldera = !hiveViejo && (casa.hive || []).some(z => z.calentando);
-  const conLuz = (n, on) => c => { c.luces.forEach(l => { if (l.nombre === n) l.on = on; }); return c; };
-  const conZona = (id, modo) => c => { c.hive.forEach(z => { if (z.id === id) { z.modo = modo; z.boost = modo === 'BOOST' ? 30 : null; } }); return c; };
-  const conRobo = t => c => { if (c.robotina) c.robotina.estado = t; return c; };
-
-  return (
-    <div className="k-col-der">
-      <div className="k-seccion">
-        <span>Calefacción</span>
-        {hiveViejo ? <span className="k-aviso">sin conexión con Hive, datos de hace rato</span>
-          : caldera ? <span className="k-caldera">{Ico.fuego} caldera encendida</span>
-          : <span className="k-sub">tocar = 30 min a 21°</span>}
-      </div>
-      <div className={`k-grid4${hiveViejo ? ' k-gris' : ''}`}>
-        {zonas.map(z => {
-          const boost = z.modo === 'BOOST', off = z.modo === 'OFF', enviando = pend[z.id];
+      <div className="c-cab"><h2>Hoy</h2><span className="c-leyenda"><i style={{ background: '#34C759' }} />Familia<i style={{ background: '#FF9F0A' }} />St Luke's</span></div>
+      <div className="c-hoy-lista">
+        {deHoy.length === 0 && <div className="c-gris">Nada en el calendario</div>}
+        {deHoy.map((e, i) => {
+          const pasado = !e.allDay && (e.end || e.start) < ahora;
+          const esSig = !pasado && !siguiente && !e.allDay && (siguiente = true);
           return (
-            <button key={z.id} className={`k-tile k-zona${boost ? ' k-on-naranja' : ''}${off ? ' k-off' : ''}`}
-              onClick={() => boost ? accion(z.id, `/calefaccion/${z.id}/programa`, null, conZona(z.id, 'SCHEDULE'))
-                : accion(z.id, `/calefaccion/${z.id}/boost`, { minutos: 30, temp: 21 }, conZona(z.id, 'BOOST'))}>
-              <span className="k-ico">{Ico.termo}</span>
-              <span className="k-temp">{z.actual != null ? Number(z.actual).toFixed(1) : '–'}<small>°</small></span>
-              <span className="k-nombre">{NOMBRE[z.nombre] || z.nombre}</span>
-              <span className="k-estado">{enviando ? 'enviando…' : boost ? `boost ${z.boost ?? ''} min` : off ? 'apagada' : `programa · ${z.consigna}°`}</span>
-            </button>
+            <div key={i} className="c-hoy-fila" style={{ background: esSig ? 'rgba(10,132,255,0.10)' : 'transparent', opacity: pasado ? 0.45 : 1 }}>
+              <span className="c-barra" style={{ background: colorCal(e) }} />
+              <div className="c-txt"><span className="c-tit">{limpio(e.title)}</span><span className="c-meta">{quien(e)}{e.location ? ` · ${e.location}` : ''}</span></div>
+              <span className="c-horaev">{e.allDay ? 'Todo el día' : hhmm(e.start)}</span>
+            </div>
           );
         })}
       </div>
-
-      <div className="k-seccion"><span>Luces</span></div>
-      <div className="k-grid3">
-        {luces.map(l => (
-          <button key={l.nombre} className={`k-tile k-luz${l.on ? ' k-on-amarillo' : ''}`}
-            onClick={() => accion(l.nombre, `/luz/${encodeURIComponent(l.nombre)}`, { on: !l.on }, conLuz(l.nombre, !l.on))}>
-            <span className="k-ico">{Ico.luz}</span>
-            <span className="k-nombre">{LUZ[l.nombre] || l.nombre}</span>
-            <span className="k-estado">{l.on ? 'encendida' : 'apagada'}</span>
-          </button>
-        ))}
-      </div>
-
-      {robo && (<>
-        <div className="k-seccion"><span>Robotina</span></div>
-        <div className="k-robo">
-          <div className="k-tile k-robo-info">
-            <span className="k-ico">{Ico.robot}</span>
-            <div><div className="k-nombre">{robo.estado}</div>
-              <div className="k-bat"><div style={{ width: `${robo.bateria || 0}%` }} /></div>
-              <div className="k-estado">{robo.bateria}% de batería</div></div>
-          </div>
-          <button className="k-tile k-btn" onClick={() => accion('robo', '/robotina/limpiar', null, conRobo('Saliendo a limpiar…'))}>Limpiar</button>
-          <button className="k-tile k-btn" onClick={() => accion('robo', '/robotina/base', null, conRobo('Volviendo a la base…'))}>A la base</button>
-          <button className="k-tile k-btn" onClick={() => accion('robo', '/robotina/buscar', null, conRobo('Pitando…'))}>¿Dónde estás?</button>
-        </div>
-      </>)}
-    </div>
+    </section>
   );
 }
 
+function Proximos({ events }) {
+  const hoy = new Date();
+  const lista = events.filter(e => !e.isOngoing && !mismoDia(e.start, hoy) && e.start > hoy && !/^club/i.test(e.title)).slice(0, 6);
+  return (
+    <section className="c-card c-prox">
+      <h2>Próximos eventos</h2>
+      {lista.map((e, i) => (
+        <div key={i} className="c-prox-fila">
+          <div className="c-dia"><span>{DOW[e.start.getDay()]}</span><b>{e.start.getDate()}</b></div>
+          <div className="c-txt"><span className="c-tit">{limpio(e.title)}</span><span className="c-meta">{e.allDay ? 'Todo el día' : hhmm(e.start)} · {quien(e)}</span></div>
+          <span className="c-punto" style={{ background: colorCal(e) }} />
+        </div>
+      ))}
+    </section>
+  );
+}
+
+function useCasa() {
+  const [casa, setCasa] = useState(null);
+  const ultimo = useRef(null);          // último estado bueno: nunca se "pierden" luces
+  const cargar = useCallback(async () => {
+    try {
+      const r = await fetch(`${API}/casa`, { cache: 'no-store' });
+      if (!r.ok) return;
+      const j = await r.json();
+      const prev = ultimo.current;
+      if (prev) {                         // si una luz falla una lectura, conserva su último estado
+        j.luces = (j.luces || []).map(l => (l.online ? l : { ...(prev.luces || []).find(p => p.nombre === l.nombre && p.online) || l, flojo: true }));
+        if (!j.hive && prev.hive) j.hive = prev.hive;
+        if (!j.robotina && prev.robotina) j.robotina = prev.robotina;
+      }
+      ultimo.current = j; setCasa(j);
+    } catch { /* sin API: se queda lo último */ }
+  }, []);
+  useEffect(() => { cargar(); const t = setInterval(cargar, 2000); return () => clearInterval(t); }, [cargar]);
+  return [casa, setCasa];
+}
+
 export default function Cocina({ events }) {
-  return <div className="k-pantalla"><Agenda events={events} /><Casa /></div>;
+  const [casa, setCasa] = useCasa();
+  const [pend, setPend] = useState({});
+  const ahora = useAhora(1000);
+
+  async function accion(clave, path, body, optimista) {
+    if (optimista) setCasa(c => (c ? optimista(structuredClone(c)) : c));
+    setPend(p => ({ ...p, [clave]: true }));
+    try { await fetch(`${API}${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) }); } catch { /* */ }
+    setTimeout(() => setPend(p => { const n = { ...p }; delete n[clave]; return n; }), 6000);
+  }
+
+  const ts = casa?.ts || {};
+  const hiveViejo = casa && (!ts.hive || Date.now() / 1000 - ts.hive > 300);
+  const zonas = (casa?.hive || []).filter(z => !OCULTAR.includes(z.nombre)).sort((a, b) => ORDEN.indexOf(a.nombre) - ORDEN.indexOf(b.nombre));
+  const luces = (casa?.luces || []).filter(l => LUZ[l.nombre]);
+  const encendidas = luces.filter(l => l.on).length;
+  const robo = casa?.robotina;
+  const caldera = (casa?.hive || []).some(z => z.calentando);
+  const limpiando = robo && /limpi|sweep|saliendo/i.test(robo.estado);
+
+  return (
+    <div className="c-fondo">
+      <div className="c-grid">
+        <div className="c-izq"><Hoy events={events} /><Proximos events={events} /></div>
+
+        <div className="c-der">
+          {!casa && <section className="c-card"><span className="c-gris">La casa sólo se controla desde la pantalla de la cocina.</span></section>}
+          {casa && (<>
+            <section className="c-card">
+              <div className="c-cab">
+                <h2>Calefacción{caldera && <span className="c-pastilla-naranja">Caldera encendida</span>}</h2>
+                <span className="c-gris">{hiveViejo ? `Hive no responde desde las ${ts.hive ? hhmm(new Date(ts.hive * 1000)) : '–'}` : 'Toca una habitación para boost de 30 min'}</span>
+              </div>
+              <div className="c-heaters">
+                {zonas.map(z => {
+                  const boost = z.modo === 'BOOST', off = z.modo === 'OFF';
+                  return (
+                    <button key={z.id} type="button" aria-pressed={boost} className={`c-heater${boost ? ' on' : ''}`}
+                      onClick={() => boost
+                        ? accion(z.id, `/calefaccion/${z.id}/programa`, null, c => { c.hive.forEach(x => { if (x.id === z.id) { x.modo = 'SCHEDULE'; x.boost = null; } }); return c; })
+                        : accion(z.id, `/calefaccion/${z.id}/boost`, { minutos: 30, temp: 21 }, c => { c.hive.forEach(x => { if (x.id === z.id) { x.modo = 'BOOST'; x.boost = 30; } }); return c; })}>
+                      <div className="c-heater-cab"><span>{NOMBRE[z.nombre] || z.nombre}</span><span className="c-ico">{ICO.fuego}</span></div>
+                      <div className="c-temp">{fmt(z.actual)}<small>°</small></div>
+                      {pend[z.id] ? <span className="c-gris">Enviando…</span>
+                        : boost ? <span className="c-boost">Boost · quedan {z.boost ?? 30} min</span>
+                        : <span className="c-gris">{off ? 'Apagada' : `Objetivo ${fmt(z.consigna)}°`}</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            <div className="c-fila">
+              <section className="c-card c-luces">
+                <div className="c-cab"><h2>Luces</h2><span className="c-gris">{encendidas ? `${encendidas} encendida${encendidas > 1 ? 's' : ''}` : 'Todas apagadas'}</span></div>
+                <div className="c-luces-lista">
+                  {luces.map(l => (
+                    <button key={l.nombre} type="button" aria-pressed={!!l.on} className={`c-luz${l.on ? ' on' : ''}`}
+                      onClick={() => accion(l.nombre, `/luz/${encodeURIComponent(l.nombre)}`, { on: !l.on }, c => { c.luces.forEach(x => { if (x.nombre === l.nombre) { x.on = !l.on; x.online = true; } }); return c; })}>
+                      <span className="c-ico">{ICO.luz}</span>
+                      <span className="c-luz-txt"><b>{LUZ[l.nombre]}</b><small>{l.on ? 'Encendida' : 'Apagada'}</small></span>
+                      <span className="c-track"><span className="c-knob" /></span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+
+              {robo && (
+                <section className="c-card c-robo">
+                  <div className="c-cab"><h2>Robotina</h2><span className={`c-pastilla${limpiando ? ' azul' : ''}`}>{robo.estado}</span></div>
+                  <div className="c-bat">
+                    <span className="c-gris">Batería</span>
+                    <span className="c-bat-num">{robo.bateria}%</span>
+                    <div className="c-bat-barra"><div style={{ width: `${robo.bateria || 0}%`, background: robo.bateria < 20 ? '#FF3B30' : '#34C759' }} /></div>
+                  </div>
+                  <div className="c-robo-botones">
+                    <button type="button" className="c-btn-azul" onClick={() => accion('robo', '/robotina/limpiar', null, c => { c.robotina.estado = 'Saliendo a limpiar…'; return c; })}>{ICO.play}Limpiar</button>
+                    <button type="button" className="c-btn" onClick={() => accion('robo', '/robotina/base', null, c => { c.robotina.estado = 'Volviendo a la base…'; return c; })}>{ICO.casa}A la base</button>
+                    <button type="button" className="c-btn" onClick={() => accion('robo', '/robotina/buscar', null, c => { c.robotina.estado = 'Pitando…'; return c; })}>{ICO.pin}¿Dónde está?</button>
+                  </div>
+                </section>
+              )}
+            </div>
+          </>)}
+        </div>
+      </div>
+      <span hidden>{ahora.getTime()}</span>
+    </div>
+  );
 }

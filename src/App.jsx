@@ -969,7 +969,8 @@ function App() {
   async function loadEvents() {
     setLoading(true);
     const evs = await fetchAllEvents();
-    setEvents(evs);
+    if (evs.length) setEvents(evs);
+    else setTimeout(loadEvents, 20000); // con la wifi de la Pi a veces falla: reintenta pronto y no borra lo que había
     setLoading(false);
   }
 
