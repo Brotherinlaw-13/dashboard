@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { fetchAllEvents } from './EventFetcher';
-import CasaAhora from './CasaAhora';
+import Cocina from './Cocina';
 import './App.css';
 
 function capitalize(str) {
@@ -979,48 +979,7 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <>
-      <div className="dashboard" style={{ top: hoyHeight ? `${hoyHeight + 32}px` : '180px' }}>
-        <h1 className="dashboard-title">Próximos</h1>
-        {loading ? (
-          <div className="placeholder">Cargando...</div>
-        ) : events.length === 0 ? (
-          <div className="placeholder">No hay eventos próximos</div>
-        ) : (
-          <div className="event-list">
-            {events
-              .filter(event => !isToday(event.start)) // excluir hoy
-              .filter(event => !event.isOngoing)      // excluir eventos en curso que empezaron antes
-              .filter(event => event.title && !event.title.toLowerCase().includes('basura'))
-              .filter(event => event.title && !event.title.toLowerCase().startsWith('club'))
-              .slice(0, 9)
-              .map((event, i) => (
-                <EventItem event={event} key={i} />
-              ))}
-          </div>
-        )}
-      </div>
-      
-      
-      <TodayEvents events={events} onHeightChange={setHoyHeight} />
-
-      <CasaAhora />
-      
-
-
-      {isModalOpen && createPortal(
-        <CalendarModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          events={events}
-          selectedDate={selectedDate}
-        />,
-        document.body
-      )}
-      
-    </>
-  );
+  return <Cocina events={events} />;
 }
 
 export default App;
