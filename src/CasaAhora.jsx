@@ -34,9 +34,10 @@ export default function CasaAhora() {
 
   return (
     <div className="casa-ahora">
-      <div className="casa-titulo">La casa ahora{caldera && <span className="casa-caldera"> · 🔥 caldera encendida</span>}</div>
+      <div className="casa-titulo">La casa{caldera && <span className="casa-caldera"> · caldera encendida</span>}</div>
 
-      {zonas.length > 0 && (
+      {zonas.length > 0 && (<>
+        <div className="casa-seccion">Calefacción · tocar pone 30 min a 21°</div>
         <div className="casa-fila">
           {zonas.map(z => {
             const boost = z.modo === 'BOOST';
@@ -46,31 +47,35 @@ export default function CasaAhora() {
                 onClick={() => boost ? accion(z.id, `/calefaccion/${z.id}/programa`) : accion(z.id, `/calefaccion/${z.id}/boost`, { minutos: 30, temp: 21 })}>
                 <span className="casa-temp">{z.actual != null ? `${Number(z.actual).toFixed(1)}°` : '–'}</span>
                 <span className="casa-nombre">{NOMBRE[z.nombre] || z.nombre}</span>
-                <span className="casa-sub">{boost ? `boost · toca para quitar` : apagada ? 'apagada' : `pide ${z.consigna}°`}</span>
+                <span className="casa-sub">{boost ? `boost ${z.boost ?? ''} min · tocar quita` : apagada ? 'apagada · tocar = boost' : `pide ${z.consigna}° · tocar = boost`}</span>
               </button>
             );
           })}
         </div>
-      )}
+      </>)}
 
+      <div className="casa-seccion">Luces</div>
       <div className="casa-fila">
         {luces.map(l => (
           <button key={l.nombre} className={`casa-luz${l.on ? ' on' : ''}`} disabled={ocupado === l.nombre}
             onClick={() => accion(l.nombre, `/luz/${encodeURIComponent(l.nombre)}`, { on: !l.on })}>
-            <span className="casa-icono">{l.on ? '💡' : '○'}</span>{LUZ[l.nombre] || l.nombre}
+            <span className={`casa-punto${l.on ? ' on' : ''}`} />{LUZ[l.nombre] || l.nombre}
           </button>
         ))}
-        {robo && (
+      </div>
+      {robo && (<>
+        <div className="casa-seccion">Robotina</div>
+        <div className="casa-fila">
           <div className="casa-robo">
-            <span className="casa-robo-estado">🧹 Robotina · {robo.estado} · {robo.bateria}%</span>
+            <span className="casa-robo-estado">{robo.estado} · {robo.bateria}%</span>
             <span className="casa-robo-botones">
               <button disabled={ocupado === 'robo'} onClick={() => accion('robo', '/robotina/limpiar')}>Limpiar</button>
               <button disabled={ocupado === 'robo'} onClick={() => accion('robo', '/robotina/base')}>A la base</button>
               <button disabled={ocupado === 'robo'} onClick={() => accion('robo', '/robotina/buscar')}>¿Dónde estás?</button>
             </span>
           </div>
-        )}
-      </div>
+        </div>
+      </>)}
     </div>
   );
 }

@@ -1210,36 +1210,33 @@ h1 {
 
 
 
-/* ---- La casa ahora (API local de la Pi) ---- */
+/* ---- Diseño cocina: izquierda Hoy + Próximos, derecha la casa ---- */
+.today-dashboard { left: 20px !important; right: auto !important; width: 400px !important; }
+.dashboard { width: 400px !important; max-width: 400px !important; bottom: 20px; overflow: hidden; }
 .casa-ahora {
-  position: fixed; z-index: 2; left: 50%; bottom: 20px; transform: translateX(-50%);
-  width: 440px; padding: 12px 14px;
+  position: fixed; z-index: 2; left: 452px; right: 20px; top: 20px; bottom: 20px;
+  display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;
   background: rgba(255, 255, 255, 0.45); border-radius: 16px; border: 1px solid rgba(255,255,255,0.22);
   box-shadow: 0 4px 24px rgba(0,0,0,0.10); backdrop-filter: blur(14px) saturate(180%); -webkit-backdrop-filter: blur(14px) saturate(180%);
   font-family: 'Segoe UI', Arial, sans-serif; color: #2F4858;
 }
-.casa-titulo { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
-.casa-caldera { font-weight: 600; color: #F26419; }
-.casa-fila { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
-.casa-fila:last-child { margin-bottom: 0; }
+.casa-titulo { font-size: 28px; font-weight: 700; }
+.casa-caldera { font-size: 20px; font-weight: 700; color: #F26419; }
+.casa-seccion { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6; margin-top: 6px; }
+.casa-fila { display: flex; gap: 12px; }
 .casa-ahora button { font-family: inherit; border: none; cursor: pointer; touch-action: manipulation; }
 .casa-ahora button:disabled { opacity: 0.5; }
-.casa-zona {
-  flex: 1 1 0; min-width: 88px; display: flex; flex-direction: column; align-items: center;
-  padding: 8px 4px; border-radius: 12px; background: rgba(255,255,255,0.6); color: #2F4858;
-}
+.casa-zona { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 6px; border-radius: 14px; background: rgba(255,255,255,0.7); color: #2F4858; }
 .casa-zona.boost { background: #F6AE2D; }
-.casa-zona.off { opacity: 0.6; }
-.casa-temp { font-size: 26px; font-weight: 700; line-height: 1.1; }
-.casa-nombre { font-size: 13px; font-weight: 600; }
-.casa-sub { font-size: 11px; opacity: 0.75; }
-.casa-luz {
-  padding: 10px 14px; border-radius: 12px; font-size: 15px; font-weight: 600;
-  background: rgba(255,255,255,0.6); color: #2F4858; display: flex; align-items: center; gap: 6px;
-}
-.casa-luz.on { background: #FFE08A; }
-.casa-icono { font-size: 16px; }
-.casa-robo { flex: 1 1 100%; display: flex; flex-direction: column; gap: 6px; }
-.casa-robo-estado { font-size: 14px; font-weight: 600; }
-.casa-robo-botones { display: flex; gap: 6px; }
-.casa-robo-botones button { flex: 1; padding: 8px 6px; border-radius: 10px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.6); color: #2F4858; }
+.casa-zona.off { opacity: 0.65; }
+.casa-temp { font-size: 46px; font-weight: 700; line-height: 1; }
+.casa-nombre { font-size: 20px; font-weight: 700; }
+.casa-sub { font-size: 13px; opacity: 0.75; }
+.casa-luz { flex: 1 1 0; padding: 22px 10px; border-radius: 14px; font-size: 24px; font-weight: 700; background: rgba(255,255,255,0.7); color: #2F4858; display: flex; align-items: center; justify-content: center; gap: 12px; }
+.casa-luz.on { background: #FFD45C; }
+.casa-punto { width: 18px; height: 18px; border-radius: 50%; border: 3px solid #2F4858; }
+.casa-punto.on { background: #2F4858; }
+.casa-robo { flex: 1; display: flex; align-items: center; gap: 12px; }
+.casa-robo-estado { font-size: 22px; font-weight: 700; min-width: 190px; }
+.casa-robo-botones { flex: 1; display: flex; gap: 10px; }
+.casa-robo-botones button { flex: 1; padding: 18px 8px; border-radius: 14px; font-size: 18px; font-weight: 700; background: rgba(255,255,255,0.7); color: #2F4858; }

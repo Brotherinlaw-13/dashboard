@@ -51,8 +51,8 @@ function EventItem({ event }) {
           <span className="event-title compact-title">{event.title}</span>
           <span className="event-date compact-date">
             {formatDate(event.start)}{' '}
-            {formatTime(event.start)}
-            {event.end && event.end.toDateString() === event.start.toDateString() && (
+            {!event.allDay && formatTime(event.start)}
+            {!event.allDay && event.end && event.end.toDateString() === event.start.toDateString() && (
               <span> - {formatTime(event.end)}</span>
             )}
           </span>
@@ -981,8 +981,8 @@ function App() {
 
   return (
     <>
-      <div className="dashboard">
-        <h1 className="dashboard-title">Futuros eventos</h1>
+      <div className="dashboard" style={{ top: hoyHeight ? `${hoyHeight + 32}px` : '180px' }}>
+        <h1 className="dashboard-title">Próximos</h1>
         {loading ? (
           <div className="placeholder">Cargando...</div>
         ) : events.length === 0 ? (
@@ -994,7 +994,7 @@ function App() {
               .filter(event => !event.isOngoing)      // excluir eventos en curso que empezaron antes
               .filter(event => event.title && !event.title.toLowerCase().includes('basura'))
               .filter(event => event.title && !event.title.toLowerCase().startsWith('club'))
-              .slice(0, 11)
+              .slice(0, 9)
               .map((event, i) => (
                 <EventItem event={event} key={i} />
               ))}
@@ -1002,20 +1002,12 @@ function App() {
         )}
       </div>
       
-      <WeatherWidget onHeightChange={setWeatherHeight} />
       
       <TodayEvents events={events} onHeightChange={setHoyHeight} />
 
       <CasaAhora />
       
-      <MonthlyCalendar 
-        events={events} 
-        hoyHeight={hoyHeight}
-        onModalOpen={(date) => {
-          setSelectedDate(date);
-          setIsModalOpen(true);
-        }}
-      />
+
 
       {isModalOpen && createPortal(
         <CalendarModal
