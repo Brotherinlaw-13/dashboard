@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { fetchAllEvents } from './EventFetcher';
+import CasaAhora from './CasaAhora';
 import './App.css';
 
 function capitalize(str) {
@@ -1004,6 +1005,8 @@ function App() {
       <WeatherWidget onHeightChange={setWeatherHeight} />
       
       <TodayEvents events={events} onHeightChange={setHoyHeight} />
+
+      <CasaAhora />
       
       <MonthlyCalendar 
         events={events} 
