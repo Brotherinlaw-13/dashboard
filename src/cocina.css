@@ -19,7 +19,7 @@ button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulat
 .c-hoy { gap: 14px; }
 .c-fecha { font-size: 17px; font-weight: 600; color: #6E6E73; }
 .c-reloj { display: flex; align-items: baseline; gap: 6px; }
-.c-hora { font-size: 84px; font-weight: 600; line-height: 1; letter-spacing: -3px; font-variant-numeric: tabular-nums; }
+.c-hora { font-size: 72px; font-weight: 600; line-height: 1; letter-spacing: -3px; font-variant-numeric: tabular-nums; }
 .c-seg { font-size: 20px; font-weight: 500; color: #8E8E93; font-variant-numeric: tabular-nums; }
 .c-leyenda { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6E6E73; }
 .c-leyenda i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-left: 6px; }
@@ -40,7 +40,7 @@ button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulat
 .c-punto { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 /* Calefacción */
 .c-heaters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.c-heater { min-height: 150px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 16px;
+.c-heater { min-height: 118px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 16px;
   border-radius: 16px; text-align: left; background: rgba(255,255,255,0.85); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   transition: background .2s, border-color .2s, box-shadow .2s; }
 .c-heater.on { background: #FFF4E5; border: 1px solid #FFB547; box-shadow: 0 0 0 3px rgba(255,159,10,0.15), 0 2px 8px rgba(255,149,0,0.15); }
@@ -52,11 +52,12 @@ button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulat
 .c-boost { display: inline-flex; background: #FFE3BF; color: #8A4200; font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
 .c-pastilla-naranja { font-size: 12px; font-weight: 600; background: #FFE3BF; color: #8A4200; padding: 3px 9px; border-radius: 999px; }
 /* Luces + Robotina */
-.c-fila { display: flex; gap: 18px; flex-grow: 1; min-height: 0; }
+.c-fila { display: flex; gap: 18px; flex: 1 1 0; min-height: 0; }
+.c-fila > .c-card { overflow: hidden; }
 .c-luces { flex: 1 1 0; }
 .c-robo { flex: 1.4 1 0; }
-.c-luces-lista { display: flex; flex-direction: column; gap: 8px; }
-.c-luz { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; text-align: left;
+.c-luces-lista { display: flex; flex-direction: column; gap: 6px; }
+.c-luz { display: flex; align-items: center; gap: 12px; padding: 6px 12px; border-radius: 14px; text-align: left;
   background: rgba(255,255,255,0.85); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 .c-luz.on { background: #FFFBEA; border-color: #FFD60A; }
 .c-luz.on .c-ico { background: #FFD60A; color: #5C4A00; }
@@ -77,3 +78,18 @@ button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulat
 .c-btn-azul, .c-btn { min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; font-size: 15px; white-space: nowrap; padding: 0 8px; }
 .c-btn-azul { background: #0A6CDB; color: #FFFFFF; border: none; font-weight: 600; box-shadow: 0 1px 2px rgba(10,108,219,0.3); }
 .c-btn { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.1); font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+
+/* Widgets cocina */
+.c-basura { flex-direction: row; align-items: center; gap: 14px; padding: 14px 20px; }
+.c-basura.urgente { background: #FFF4E5; border: 1px solid #FFB547; box-shadow: 0 0 0 3px rgba(255,159,10,0.15), 0 2px 8px rgba(255,149,0,0.15); }
+.c-cubo { width: 34px; height: 40px; border-radius: 6px 6px 9px 9px; flex-shrink: 0; box-shadow: inset 0 6px 0 rgba(0,0,0,0.15); }
+.c-basura-tipo { font-size: 22px; font-weight: 600; }
+.c-nevera { flex: 1.3 1 0; } .c-comedor { flex: 1 1 0; }
+.c-nev-lista { display: flex; flex-direction: column; gap: 2px; }
+.c-nev-fila { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.c-nev-cuando { font-size: 13px; font-weight: 600; color: #6E6E73; white-space: nowrap; padding: 3px 9px; border-radius: 999px; background: #F2F2F7; }
+.c-nev-cuando.naranja { background: #FFE3BF; color: #8A4200; } .c-nev-cuando.rojo { background: #FFD6D3; color: #A1170E; }
+.c-idea { font-size: 13px; color: #3A3A3C; line-height: 1.35; background: rgba(52,199,89,0.10); border-radius: 12px; padding: 8px 12px; }
+.c-com-fila { display: flex; flex-direction: column; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.c-com-nombre { font-size: 12px; font-weight: 700; color: #6E6E73; text-transform: uppercase; letter-spacing: .05em; }
+.c-com-plato { font-size: 17px; font-weight: 600; }

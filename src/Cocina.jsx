@@ -2,6 +2,7 @@
 // con datos reales: calendarios (Vercel) y casa (API local de la Pi, 127.0.0.1:8787).
 import { useEffect, useRef, useState, useCallback } from 'react';
 import './cocina.css';
+import { Basura, FilaCocina } from './Widgets';
 
 const API = 'http://127.0.0.1:8787';
 const OCULTAR = ['Salon1', 'Salon2'];
@@ -35,7 +36,7 @@ function Hoy({ events }) {
   const ahora = useAhora(1000);
   let fecha = new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).format(ahora);
   fecha = fecha.charAt(0).toUpperCase() + fecha.slice(1);
-  const deHoy = events.filter(e => mismoDia(e.start, ahora) || e.isOngoing).slice(0, 5);
+  const deHoy = events.filter(e => (mismoDia(e.start, ahora) || e.isOngoing) && !/basura/i.test(e.title)).slice(0, 5);
   let siguiente = false;
   return (
     <section className="c-card c-hoy">
@@ -64,7 +65,7 @@ function Hoy({ events }) {
 
 function Proximos({ events }) {
   const hoy = new Date();
-  const lista = events.filter(e => !e.isOngoing && !mismoDia(e.start, hoy) && e.start > hoy && !/^club/i.test(e.title)).slice(0, 6);
+  const lista = events.filter(e => !e.isOngoing && !mismoDia(e.start, hoy) && e.start > hoy && !/^club/i.test(e.title) && !/basura/i.test(e.title)).slice(0, 6);
   return (
     <section className="c-card c-prox">
       <h2>Próximos eventos</h2>
@@ -124,7 +125,7 @@ export default function Cocina({ events }) {
   return (
     <div className="c-fondo">
       <div className="c-grid">
-        <div className="c-izq"><Hoy events={events} /><Proximos events={events} /></div>
+        <div className="c-izq"><Hoy events={events} /><Basura events={events} /><Proximos events={events} /></div>
 
         <div className="c-der">
           {!casa && <section className="c-card"><span className="c-gris">La casa sólo se controla desde la pantalla de la cocina.</span></section>}
@@ -184,6 +185,7 @@ export default function Cocina({ events }) {
                 </section>
               )}
             </div>
+            <FilaCocina />
           </>)}
         </div>
       </div>
