@@ -5,6 +5,12 @@
     },
     "api/setup-webhook.js": {
       "maxDuration": 10
+    },
+    "api/calendar.js": {
+      "maxDuration": 15
+    },
+    "api/weather-summary.js": {
+      "maxDuration": 15
     }
   }
-} 
+}

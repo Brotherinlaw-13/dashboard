@@ -572,20 +572,9 @@ function WeatherWidget({ onHeightChange }) {
         
         console.log('Fetching weather for:', city);
         
-        // First get coordinates for the city using Google Geocoding API
-        const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
-        const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(city)}&key=${API_KEY}`;
-        
-        const geocodeResponse = await fetch(geocodeUrl);
-        const geocodeData = await geocodeResponse.json();
-        
-        if (!geocodeData.results || geocodeData.results.length === 0) {
-          throw new Error('City not found');
-        }
-        
-        const location = geocodeData.results[0].geometry.location;
-        const lat = location.lat;
-        const lng = location.lng;
+        // Coordenadas fijas de Maidenhead: sin clave de Google en el navegador
+        const lat = 51.5226;
+        const lng = -0.7187;
         
         console.log('Coordinates:', lat, lng);
         
@@ -790,38 +779,10 @@ function WeatherWidget({ onHeightChange }) {
 
       console.log('Weather data for OpenAI:', weatherData);
 
-      const prompt = `Eres un amigo optimista que explica el tiempo de HOY con humor ligero y positivismo. SIEMPRE empieza con "Hoy" y ve directo al grano. Añade algo de humor que arranque una sonrisa sin ser cursi. NO te despidas al final.
-
-Aquí tienes el tiempo hora por hora para HOY:
-${weatherData.map(hour => `${hour.time}: ${hour.temperature}°C, ${hour.condition}`).join('\n')}
-
-Sé MUY específico con las horas. Si va a llover, di exactamente a qué hora y con qué probabilidad. Por ejemplo: "Hoy nublado pero a las 12 de la mañana y a las 3 de la tarde lloverá con bastante posibilidad". 
-
-Analiza los datos y da un resumen práctico pero con humor positivo y optimista. Máximo 2 emojis. Máximo 3-4 frases. SIEMPRE empieza con "Hoy". Menciona horas específicas cuando sea relevante.
-
-Formato de respuesta:
-TÍTULO: [un título corto y atractivo sobre el tiempo de HOY]
-RESUMEN: [resumen específico del día con humor positivo]`;
-
-      console.log('OpenAI API Key available:', !!import.meta.env.VITE_OPENAI_API_KEY);
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch('/api/weather-summary', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          max_tokens: 150,
-          temperature: 0.7
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ weatherData })
       });
 
       console.log('OpenAI response status:', response.status);
