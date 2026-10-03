@@ -69,7 +69,7 @@ button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulat
 .c-luz.on .c-knob { left: 20px; }
 .c-pastilla { font-size: 13px; font-weight: 600; background: #F2F2F7; color: #3A3A3C; padding: 4px 10px; border-radius: 999px; }
 .c-pastilla.azul { background: rgba(10,132,255,0.12); color: #0A4FA8; }
-.c-bat { display: flex; flex-direction: column; gap: 6px; flex-grow: 1; justify-content: center; }
+.c-bat { display: flex; flex-direction: column; gap: 6px; }
 .c-bat-num { font-size: 30px; font-weight: 500; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
 .c-bat-barra { height: 6px; background: #E5E5EA; border-radius: 999px; overflow: hidden; }
 .c-bat-barra div { height: 100%; border-radius: 999px; }
