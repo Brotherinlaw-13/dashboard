@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import './cocina.css';
 import { Basura, FilaCocina } from './Widgets';
+import Regar from './Regar';
 
 const API = 'http://127.0.0.1:8787';
 const OCULTAR = ['Salon1', 'Salon2'];
@@ -190,6 +191,7 @@ export default function Cocina({ events }) {
         </div>
       </div>
       <span hidden>{ahora.getTime()}</span>
+      <Regar />
     </div>
   );
 }

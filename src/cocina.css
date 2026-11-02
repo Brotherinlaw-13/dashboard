@@ -93,3 +93,18 @@ button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulat
 .c-com-fila { display: flex; flex-direction: column; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
 .c-com-nombre { font-size: 12px; font-weight: 700; color: #6E6E73; text-transform: uppercase; letter-spacing: .05em; }
 .c-com-plato { font-size: 17px; font-weight: 600; }
+
+/* Luces, lámparas, LED y enchufes: sin animaciones ni transiciones, el cambio es instantáneo (Diego 02/11) */
+.c-luz, .c-luz *, .c-luz:hover, .c-luz:active { transition: none !important; animation: none !important; }
+
+/* Aviso de los miércoles: "Hay que regar" (sin animaciones) */
+.r-fondo { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: rgba(20,30,20,0.55); }
+.r-caja { width: 86vw; height: 82vh; box-sizing: border-box; background: #FFFFFF; border-radius: 36px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 32px; color: #1D1D1F;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Noto Sans', 'DejaVu Sans', sans-serif; }
+.r-maceta { width: 200px; height: 216px; }
+.r-titulo { margin: 0; font-size: 96px; font-weight: 700; line-height: 1.05; letter-spacing: -2px; text-align: center; }
+.r-titulo span { display: none; } /* el emoji sólo como texto accesible; se ve el dibujo de arriba */
+.r-ok, .r-ok:hover, .r-ok:active { transition: none !important; animation: none !important; }
+.r-ok { min-width: 360px; min-height: 130px; padding: 0 60px; border: none; border-radius: 28px; background: #34C759; color: #FFFFFF;
+  font-size: 64px; font-weight: 700; letter-spacing: 2px; }
