@@ -25,6 +25,43 @@ export function Basura({ events }) {
   );
 }
 
+// Pendientes del día (el resumen de la mañana). Tocar tacha; volver a tocar lo destacha.
+// Lo tachado se guarda en la Pi y el turno de noche ya no lo vuelve a sacar.
+export function Pendientes() {
+  const [lista, setLista] = useState([]);
+  const [hechos, setHechos] = useState({});
+  useEffect(() => {
+    const cargar = async () => {
+      try {
+        const [a, b] = await Promise.all([fetch(`${API}/cocina`, { cache: 'no-store' }), fetch(`${API}/pendientes/hechos`, { cache: 'no-store' })]);
+        if (a.ok) setLista((await a.json()).pendientes || []);
+        if (b.ok) setHechos(await b.json());
+      } catch { /* sin Pi: no se pinta */ }
+    };
+    cargar(); const t = setInterval(cargar, 60000); return () => clearInterval(t);
+  }, []);
+  if (!lista.length) return null;
+  const tocar = async p => {
+    const hecho = !hechos[p.id];
+    setHechos(h => { const n = { ...h }; if (hecho) n[p.id] = { texto: p.texto }; else delete n[p.id]; return n; });
+    try { await fetch(`${API}/pendientes/hecho`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: p.id, texto: p.texto, hecho }) }); } catch { /* */ }
+  };
+  const quedan = lista.filter(p => !hechos[p.id]).length;
+  return (
+    <section className="c-card c-pend">
+      <div className="c-cab"><h2>Pendientes</h2><span className="c-gris">{quedan ? 'Toca para tachar' : 'Todo hecho'}</span></div>
+      <div className="c-pend-lista">
+        {lista.map(p => (
+          <button key={p.id} type="button" aria-pressed={!!hechos[p.id]} className={`c-pend-fila${hechos[p.id] ? ' hecho' : ''}`} onClick={() => tocar(p)}>
+            <span className="c-check">{hechos[p.id] && <svg viewBox="0 0 16 16" width="12" height="12"><path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>}</span>
+            <span className="c-pend-txt">{p.texto}</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function FilaCocina() {
   const [d, setD] = useState(null);
   useEffect(() => {

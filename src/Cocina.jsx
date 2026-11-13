@@ -2,7 +2,7 @@
 // con datos reales: calendarios (Vercel) y casa (API local de la Pi, 127.0.0.1:8787).
 import { useEffect, useRef, useState, useCallback } from 'react';
 import './cocina.css';
-import { Basura, FilaCocina } from './Widgets';
+import { Basura, FilaCocina, Pendientes } from './Widgets';
 import Regar from './Regar';
 
 const API = 'http://127.0.0.1:8787';
@@ -126,7 +126,7 @@ export default function Cocina({ events }) {
   return (
     <div className="c-fondo">
       <div className="c-grid">
-        <div className="c-izq"><Hoy events={events} /><Basura events={events} /><Proximos events={events} /></div>
+        <div className="c-izq"><Hoy events={events} /><Basura events={events} /><Pendientes /><Proximos events={events} /></div>
 
         <div className="c-der">
           {!casa && <section className="c-card"><span className="c-gris">La casa sólo se controla desde la pantalla de la cocina.</span></section>}
